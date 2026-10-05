@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Match reports live under matches/{teamId}/ and only the team's owner can
+// upload, delete or fetch them through the SDK. Download URLs from
+// getDownloadURL carry a token and skip these rules, so anyone holding one
+// can open the file. Uploads must be PDFs under 10 MB.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /matches/{teamId}/{fileName} {
+      function ownsTeam() {
+        return request.auth != null
+          && request.auth.token.email_verified == true
+          && firestore.get(/databases/(default)/documents/teams/$(teamId)).data.createdBy == request.auth.uid;
+      }
+
+      allow read, delete: if ownsTeam();
+      allow create, update: if ownsTeam()
+        && request.resource.contentType == 'application/pdf'
+        && request.resource.size < 10 * 1024 * 1024;
+    }
+  }
+}
