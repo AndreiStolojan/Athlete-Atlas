@@ -6,7 +6,6 @@
 </p>
 
 <p align="center">
-  <a href="https://athlete-atlas.vercel.app">Open the app</a> ·
   <a href="#run-your-own">Run your own</a>
 </p>
 
@@ -33,7 +32,7 @@ Most clubs already keep their roster in a spreadsheet, so the team page takes `.
 
 ## Under the hood
 
-React 19 and Material UI in the browser. Firebase does the rest: Authentication for sign-in (email with verification, or Google), Firestore for teams, players and matches, and Storage for the PDF reports. Recharts draws the results chart and SheetJS reads the Excel files. The live version runs on Vercel.
+React 19 and Material UI in the browser. Firebase does the rest: Authentication for sign-in (email with verification, or Google), Firestore for teams, players and matches, and Storage for the PDF reports. Recharts draws the results chart and SheetJS reads the Excel files.
 
 Data lives in one `teams` collection, with each team's players and matches nested under it:
 
