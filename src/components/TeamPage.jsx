@@ -94,7 +94,15 @@ const TeamPage = () => {
             return;
         }
 
-        const teamDoc = await getDoc(doc(db, "teams", teamId));
+        let teamDoc;
+        try {
+            // Rules deny teams the user doesn't own, so a foreign or deleted team throws here.
+            teamDoc = await getDoc(doc(db, "teams", teamId));
+        } catch (error) {
+            console.error("Echipa nu poate fi deschisă:", error.message);
+            navigate("/dashboard");
+            return;
+        }
         const teamData = { id: teamDoc.id, ...teamDoc.data() };
         setTeam(teamData);
 
@@ -153,13 +161,7 @@ const TeamPage = () => {
 
             if (matchPdfUrl) {
                 try {
-                    const decodedUrl = decodeURIComponent(matchPdfUrl);
-                    const baseUrl = `https://firebasestorage.googleapis.com/v0/b/${process.env.REACT_APP_FIREBASE_STORAGE_BUCKET}/o/`;
-                    if (decodedUrl.startsWith(baseUrl)) {
-                        const relativePath = decodedUrl.replace(baseUrl, "").split("?")[0];
-                        const fileRef = ref(storage, relativePath);
-                        await deleteObject(fileRef);
-                    }
+                    await deleteObject(ref(storage, matchPdfUrl));
                 } catch (fileError) {
                     console.warn("Fișierul nu a fost găsit în Firebase Storage:", fileError.message);
                 }
@@ -211,9 +213,13 @@ const TeamPage = () => {
                 if (fileExtension !== "pdf") {
                     return alert("Doar fișiere de tip PDF sunt permise!");
                 }
+                // Same limit as storage.rules.
+                if (newMatchFile.size >= 10 * 1024 * 1024) {
+                    return alert("Fișierul PDF trebuie să aibă sub 10 MB!");
+                }
 
                 const storageRef = ref(storage, `matches/${teamId}/${newMatchFile.name}`);
-                await uploadBytes(storageRef, newMatchFile);
+                await uploadBytes(storageRef, newMatchFile, { contentType: "application/pdf" });
                 pdfUrl = await getDownloadURL(storageRef);
             }
 

@@ -1,11 +1,12 @@
 rules_version = '2';
 
 // Each team belongs to the user who created it. Only that user can read or
-// change the team, its members and its matches.
+// change the team, its members and its matches. Like the app itself, the
+// rules only let in users with a verified email.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {
-      return request.auth != null;
+      return request.auth != null && request.auth.token.email_verified == true;
     }
 
     function ownsTeam(teamId) {
@@ -21,7 +22,7 @@ service cloud.firestore {
         && request.resource.data.createdBy == resource.data.createdBy;
 
       match /{subcollection}/{docId} {
-        allow read, write: if ownsTeam(teamId);
+        allow read, write: if subcollection in ['members', 'matches'] && ownsTeam(teamId);
       }
     }
   }
