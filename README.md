@@ -5,26 +5,22 @@
   Rosters, medical visas and match results for a club's coach.
 </p>
 
-<p align="center">
-  <a href="#run-your-own">Run your own</a>
-</p>
-
 I played performance handball for years, won two national titles, and captained my team. The matches were the easy part to keep track of. The paperwork wasn't: every player needs a registration card and a valid medical visa, and somebody has to notice when one expires before the referee does.
 
-Athlete Atlas keeps that in one place. A coach creates a team, adds players or imports them from the Excel sheet the club already has, and logs every match with the score and the official report.
+Athlete Atlas keeps that in one place. A coach creates a team, adds players by hand or from an Excel sheet, and logs every match with the score and the official report. Each player's medical visa date sits next to their name. The app doesn't warn you when one expires yet, so you still have to read the dates.
 
 ## What it keeps track of
 
 - **Players.** Name, father's initial, birth date, CNP, registration number, university, and the date their medical visa runs out. Each player is marked active or inactive.
 - **Matches.** Opponent, date, score, and the match report as a PDF.
 - **Results.** Wins, draws and losses for each team, drawn as a chart.
-- **Teams.** Football, handball, basketball, volleyball or tennis. The dashboard shows each coach only the teams they created.
+- **Teams.** Type the sport in Romanian: `fotbal`, `handbal`, `baschet`, `volei` or `tenis`. Score fields only show up for these five. The dashboard shows each coach only the teams they created.
 
 The interface is in Romanian, like the clubs it was made for.
 
 ## Importing players from Excel
 
-Most clubs already keep their roster in a spreadsheet, so the team page takes `.xlsx` and `.xls` files directly. Name the columns like this:
+The team page imports players from the first sheet of an `.xlsx` or `.xls` file. The headers have to match these exactly, diacritics included, and every column has to be formatted as Text, because the import reads each cell as text:
 
 | Nume | Prenume | Inițiala tatălui | Data nașterii | CNP | Număr legitimație | Universitate | Expirare viză medicală | Activ |
 |---|---|---|---|---|---|---|---|---|
@@ -47,7 +43,7 @@ teams/{teamId}/matches/{matchId}
 You need Node.js and a Firebase project with Authentication (email/password and Google), Firestore and Storage turned on.
 
 1. Put your project's config in `src/firebase.jsx`.
-2. Write Firestore and Storage rules that let a user read and write only the teams they created. The app filters by owner in the browser, but only the rules actually enforce it.
+2. Deploy the rules in this repo, which limit every team to the user who created it: `firebase use --add`, then `firebase deploy --only firestore:rules,storage`.
 3. Install and start:
 
 ```bash
@@ -56,6 +52,8 @@ npm start
 ```
 
 `npm run build` produces the production build.
+
+This is a portfolio project. It stores CNPs, which count as personal data under GDPR, so review the rules and your obligations before you put real players in it.
 
 ## Who built it
 
