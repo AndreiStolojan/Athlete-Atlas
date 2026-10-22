@@ -44,5 +44,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.13.6",
+    "underscore": "^1.13.8",
+    "nth-check": "^2.0.1"
   }
 }
